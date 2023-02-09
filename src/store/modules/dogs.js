@@ -1,31 +1,79 @@
 import { http } from "@/utils/axios";
-
-const getUniqueDogBreeds = (current_breeds, data) => {
-  const breedsSet = new Set(current_breeds);
-  return data.filter((dogs_images) => !breedsSet.has(dogs_images));
-};
+import {
+  getBreeds,
+  getBreedsAndSubBreeds,
+  searchBreedsAndSubBreeds,
+} from "@/utils/fn";
 
 const state = () => ({
-  dog_breeds: [],
+  initial_dogs: [],
+  dogs: [],
+  breed_list: [],
+  loading: false,
 });
 
 const getters = {
-  dog_breeds: (state) => state.dog_breeds,
+  dogs: (state) => state.dogs,
+  loading: (state) => state.loading,
 };
 
 const actions = {
+  async getBreedList({ commit }) {
+    try {
+      const response = await http.get("/breeds/list/all");
+      const breeds = getBreedsAndSubBreeds(response.data.message);
+      commit("SET_BREED_LIST", breeds);
+    } catch (error) {
+      console.error(error);
+    }
+  },
   async getDogs({ commit }) {
     try {
-      const breeds = [];
-      let count = 0;
-      while (count < 100) {
-        const response = await http.get("/breeds/image/random/50");
-        const uniqueBreeds = getUniqueDogBreeds(breeds, response.data.message);
-        const data = uniqueBreeds.slice(0, 100 - count);
-        breeds.push(...data);
-        count += data.length;
+      commit("SET_LOADING", true);
+      const dogs = await getBreeds([], 100);
+      commit("SET_INITIAL_DOGS", dogs);
+      commit("SET_DOGS", dogs);
+      commit("SET_LOADING", false);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async loadMoreDogs({ state, commit }) {
+    // After loading 100 dogs, subsequently only add 10 more dogs.
+    try {
+      commit("SET_LOADING", true);
+      const dogs = await getBreeds(state.dogs, 10);
+      commit("SET_INITIAL_DOGS", dogs);
+      commit("SET_DOGS", dogs);
+      commit("SET_LOADING", false);
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async searchDog({ state, commit }, payload) {
+    commit("SET_LOADING", true);
+
+    if (payload === "") {
+      commit("SET_DOGS", state.initial_dogs);
+      commit("SET_LOADING", false);
+      return;
+    }
+
+    let searchData = searchBreedsAndSubBreeds(state.breed_list, payload);
+
+    try {
+      const dogs = [];
+      for (const searchText of searchData) {
+        const response = await http.get(
+          `/breed/${searchText.split("-").join("/")}/images/random`
+        );
+
+        dogs.push(response.data.message);
       }
-      commit("SET_DOG_BREEDS", breeds);
+
+      commit("SET_DOGS", dogs);
+
+      commit("SET_LOADING", false);
     } catch (error) {
       console.error(error);
     }
@@ -33,8 +81,17 @@ const actions = {
 };
 
 const mutations = {
-  SET_DOG_BREEDS(state, data) {
-    state.dog_breeds = data;
+  SET_INITIAL_DOGS(state, data) {
+    state.initial_dogs = data;
+  },
+  SET_DOGS(state, data) {
+    state.dogs = data;
+  },
+  SET_BREED_LIST(state, data) {
+    state.breed_list = data;
+  },
+  SET_LOADING(state, data) {
+    state.loading = data;
   },
 };
 
