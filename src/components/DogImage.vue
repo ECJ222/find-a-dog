@@ -1,9 +1,10 @@
 <template>
-  <img :class="className" :src="source" :alt="altText" loading="lazy" />
+  <img :class="className" :data-src="source" :alt="altText" />
 </template>
 
 <script>
 export default {
+  name: "DogImage",
   props: {
     className: {
       type: String,
@@ -24,5 +25,6 @@ export default {
 <style scoped>
 img {
   object-fit: cover;
+  visibility: hidden;
 }
 </style>
