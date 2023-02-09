@@ -9,10 +9,10 @@
         @input.prevent="search"
       />
     </div>
-    <dog-grid :dog-breeds="dog_breeds" />
+    <dog-grid :dog-breeds="dogs" />
     <dog-loader v-show="loading" />
     <button
-      v-show="!loading && dog_breeds.length < 20000"
+      v-show="!loading && dogs.length < 148 && search_text.trim().length < 1"
       class="load-more"
       @click="loadMoreImages"
     >
@@ -24,10 +24,11 @@
 <script>
 import DogGrid from "@/components/DogGrid.vue";
 import DogLoader from "@/components/DogLoader.vue";
+import { debounce } from "@/utils/fn";
 import { mapGetters } from "vuex";
 
 export default {
-  name: "BreedsList",
+  name: "DogList",
   data() {
     return {
       search_text: "",
@@ -38,9 +39,13 @@ export default {
     DogLoader,
   },
   computed: {
-    ...mapGetters("dogs", ["dog_breeds", "loading"]),
+    ...mapGetters("dogs", ["dogs", "loading"]),
   },
   created() {
+    this.debouncedSearch = debounce((search_text) => {
+      this.$store.dispatch("dogs/searchDog", search_text);
+    }, 2000);
+    this.$store.dispatch("dogs/getBreedList");
     this.$store.dispatch("dogs/getDogs");
   },
   methods: {
@@ -48,7 +53,7 @@ export default {
       this.$store.dispatch("dogs/loadMoreDogs");
     },
     search() {
-      this.$store.dispatch("dogs/searchDog", this.search_text);
+      this.debouncedSearch(this.search_text);
     },
   },
 };
