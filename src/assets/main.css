@@ -17,6 +17,12 @@
   }
 }
 
+@counter-style paws {
+  system: cyclic;
+  symbols: "🐾";
+  suffix: " ";
+}
+
 *,
 *:before,
 *:after {

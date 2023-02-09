@@ -1,55 +1,61 @@
 <template>
   <div class="grid">
     <div class="grid__list">
-      <div
-        class="grid__wrapper"
+      <router-link
+        :to="getDogName(image)"
         v-for="(image, index) in grid1"
         :key="`grid-1-${index}`"
       >
-        <div class="grid__container" :style="getRandomSize()">
-          <dog-image
-            :source="image"
-            :class-name="'grid__photo'"
-            :alt-text="getDogName(image)"
-          />
-          <div class="grid__photo-hover"></div>
+        <div class="grid__wrapper">
+          <div class="grid__container" :style="getRandomSize()">
+            <dog-image
+              :source="image"
+              :class-name="'grid__photo'"
+              :alt-text="getDogName(image)"
+            />
+            <div class="grid__photo-hover"></div>
+          </div>
         </div>
-      </div>
+      </router-link>
     </div>
 
     <div class="grid__list">
-      <div
-        class="grid__wrapper"
+      <router-link
+        :to="getDogName(image)"
         v-for="(image, index) in grid2"
         :key="`grid-2-${index}`"
       >
-        <div class="grid__container" :style="getRandomSize()">
-          <dog-image
-            :source="image"
-            :class-name="'grid__photo'"
-            :alt-text="getDogName(image)"
-          />
-          <div class="grid__photo-hover"></div>
+        <div class="grid__wrapper">
+          <div class="grid__container" :style="getRandomSize()">
+            <dog-image
+              :source="image"
+              :class-name="'grid__photo'"
+              :alt-text="getDogName(image)"
+            />
+            <div class="grid__photo-hover"></div>
+          </div>
         </div>
-      </div>
+      </router-link>
     </div>
 
     <div class="grid__list">
-      <div
-        class="grid__wrapper"
+      <router-link
+        :to="getDogName(image)"
         v-for="(image, index) in grid3"
         :key="`grid-3-${index}`"
       >
-        <div class="grid__container" :style="getRandomSize()">
-          <dog-image
-            :source="image"
-            :class-name="'grid__photo'"
-            :alt-text="getDogName(image)"
-          />
+        <div class="grid__wrapper">
+          <div class="grid__container" :style="getRandomSize()">
+            <dog-image
+              :source="image"
+              :class-name="'grid__photo'"
+              :alt-text="getDogName(image)"
+            />
 
-          <div class="grid__photo-hover"></div>
+            <div class="grid__photo-hover"></div>
+          </div>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
@@ -58,6 +64,7 @@
 import DogImage from "@/components/DogImage";
 
 export default {
+  name: "DogGrid",
   props: {
     dogBreeds: {
       type: Array,
@@ -117,7 +124,6 @@ export default {
 .grid__container {
   width: 99%;
   position: relative;
-  background: #eee;
   border-radius: 5px;
 }
 .grid__photo {
@@ -127,7 +133,6 @@ export default {
   width: 100%;
   height: 100%;
   border-radius: 5px;
-  object-fit: cover;
 }
 .grid__wrapper:hover .grid__photo-hover {
   position: absolute;

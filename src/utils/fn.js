@@ -39,7 +39,6 @@ export function searchBreedsAndSubBreeds(breed_list, searchText) {
   return breed_list.filter((breed) => {
     return searchText.split(" ").some((char) => {
       const data = breed.split("-");
-      console.log(data[0], char);
       if (data[0] === char) {
         return true;
       }
