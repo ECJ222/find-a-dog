@@ -1,37 +1,54 @@
 <template>
   <div class="container">
-    <div class="grid">
-      <div
-        class="grid__item"
-        v-for="(image, index) in dog_breeds"
-        :key="index"
-        :class="getImageClassCategory()"
-      >
-        <img :src="image" class="grid__image" :alt="getDogName(image)" />
-      </div>
+    <h1 class="header">Looking for a dog 🐾</h1>
+    <div class="search">
+      <input
+        type="search"
+        placeholder="Have one in mind?"
+        v-model="search_text"
+        @input.prevent="search"
+      />
     </div>
+    <dog-grid :dog-breeds="dog_breeds" />
+    <dog-loader v-show="loading" />
+    <button
+      v-show="!loading && dog_breeds.length < 20000"
+      class="load-more"
+      @click="loadMoreImages"
+    >
+      Load more
+    </button>
   </div>
 </template>
 
 <script>
+import DogGrid from "@/components/DogGrid.vue";
+import DogLoader from "@/components/DogLoader.vue";
 import { mapGetters } from "vuex";
 
 export default {
   name: "BreedsList",
+  data() {
+    return {
+      search_text: "",
+    };
+  },
+  components: {
+    DogGrid,
+    DogLoader,
+  },
   computed: {
-    ...mapGetters("dogs", ["dog_breeds"]),
+    ...mapGetters("dogs", ["dog_breeds", "loading"]),
   },
   created() {
     this.$store.dispatch("dogs/getDogs");
   },
   methods: {
-    getImageClassCategory() {
-      return ["grid__item--wide", "grid__item--big", "grid__item--tall"][
-        Math.floor(Math.random() * 3)
-      ];
+    loadMoreImages() {
+      this.$store.dispatch("dogs/loadMoreDogs");
     },
-    getDogName(image) {
-      return image.split("/")[4];
+    search() {
+      this.$store.dispatch("dogs/searchDog", this.search_text);
     },
   },
 };
@@ -41,73 +58,41 @@ export default {
 .container {
   width: 100vw;
 }
-
-.grid {
-  display: grid;
-  padding: 0;
-  margin: 0;
-  grid-template-columns: repeat(2, 50vw);
-  grid-auto-rows: 50vw;
-  grid-auto-flow: dense;
-  gap: 1rem;
+.container .header {
+  text-align: center;
+  font-size: 5rem;
+  color: #484848;
+  margin: 3rem 0 4rem;
 }
-
-.grid__item {
-  list-style: none;
-  height: 100%;
-}
-
-.grid__item--wide {
-  grid-column: auto / span 2;
-}
-
-.grid__item--tall {
-  grid-row: auto / span 2;
-}
-
-.grid__item--big {
-  grid-column: auto / span 2;
-  grid-row: auto / span 2;
-}
-
-.grid__image {
-  object-fit: cover;
+.container button.load-more {
+  background-color: #484848;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 1.5rem;
+  padding: 1rem 2rem;
+  text-align: center;
   display: block;
-  width: 100%;
-  height: 100%;
-  transition: 0.1s;
+  margin: 3rem auto;
   cursor: pointer;
 }
-
-.grid__image:hover {
-  filter: sepia(100%);
+.search {
+  margin: 0 auto 3rem;
+  text-align: center;
+}
+.search input[type="search"] {
+  width: 50%;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #484848;
+  outline: none;
+  box-shadow: 0px 0px 10px 0px #ccc;
+  transition: all 0.3s;
 }
 
-@media (min-width: 416px) {
-  .grid {
-    grid-template-columns: repeat(3, 30vw);
-    grid-auto-rows: 30vw;
-  }
-}
-
-@media (min-width: 800px) {
-  .grid {
-    grid-template-columns: repeat(4, 25vw);
-    grid-auto-rows: 25vw;
-  }
-}
-
-@media (min-width: 960px) {
-  .grid {
-    grid-template-columns: repeat(5, 20vw);
-    grid-auto-rows: 20vw;
-  }
-}
-
-@media (min-width: 1280px) {
-  .grid {
-    grid-template-columns: repeat(6, 15vw);
-    grid-auto-rows: 15vw;
-  }
+.search input[type="search"]:focus {
+  width: 60%;
+  box-shadow: 0px 0px 10px 0px #484848;
 }
 </style>
