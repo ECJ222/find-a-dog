@@ -1,4 +1,4 @@
-# dog-breeds
+# find-a-dog
 
 ## Project setup
 ```
